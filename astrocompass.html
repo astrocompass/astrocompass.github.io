@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AstroCompass</title>
+  <style>
+    :root{ --bg:#0b1020; --border:#223055; --text:#e8ecff; --muted:#aab4d6; --accent:#7aa2ff; --accent-2:#33e0a1; }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,'Noto Sans',sans-serif;background:linear-gradient(180deg,var(--bg),#0a0f1d 40%,#0b0f1c);color:var(--text)}
+
+    /* NAVBAR */
+    .nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(1.4) blur(8px);background:rgba(9,14,30,.6);border-bottom:1px solid var(--border)}
+    .navwrap{max-width:1100px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .nav-left{display:flex;align-items:center;gap:12px;width:33%}
+    .nav-center{display:flex;justify-content:center;width:34%}
+    .nav-right{display:flex;align-items:center;justify-content:flex-end;width:33%;margin-left:10px}
+
+    .btn{appearance:none;border:1px solid var(--border);background:#0e1630;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;transition:transform .12s ease, background .2s ease, border-color .2s ease;text-decoration:none}
+    .btn:hover{transform:translateY(-1px);background:#101a39;border-color:#2c4177}
+    .btn:active{transform:translateY(0)}
+
+    .brand{font-weight:800;letter-spacing:.4px;font-size:20px;position:relative;cursor:pointer;user-select:none;color:var(--text);text-decoration:none}
+    .brand::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transform:scaleX(0.65);transform-origin:left;transition:transform .25s ease}
+    .brand:hover::after{transform:scaleX(1)}
+
+    .link{color:var(--muted);text-decoration:none;border-bottom:1px dashed transparent;transition:color .2s ease,border-color .2s ease}
+    .link:hover{color:#fff;border-color:var(--accent)}
+
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 80px}
+
+    /* HOME / HERO */
+    .hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:80px 16px}
+    .hero h1{font-size:48px;line-height:1.1;margin:0}
+    .hero .underline{height:2px;width:220px;background:linear-gradient(90deg,var(--accent),var(--accent-2));margin-top:8px;border-radius:2px}
+    .hero p{max-width:740px;color:var(--muted);margin:6px 0 18px}
+
+    /* SLIDES */
+    .stack{display:flex;flex-direction:column;gap:26px;margin-top:14px}
+    .slide{background:linear-gradient(180deg,#0f1736,#0d142c);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+    .slide-inner{display:grid;grid-template-columns:1.1fr 1fr;grid-template-areas:"txt img"}
+    .slide .txt{grid-area:txt;padding:22px}
+    .slide h3{margin:0 0 8px}
+    .slide p{margin:0;color:var(--muted);line-height:1.6}
+    .slide img{grid-area:img;width:100%;height:100%;object-fit:cover;display:block;border-left:1px solid var(--border)}
+    .stack .slide:nth-child(even) .slide-inner{grid-template-columns:1fr 1.1fr;grid-template-areas:"img txt"}
+    .stack .slide:nth-child(even) img{border-left:none;border-right:1px solid var(--border)}
+
+    /* ABOUT */
+    .about{max-width:900px;margin:0 auto;padding:28px 18px 80px}
+    .about h1{margin:18px 0 6px}
+    .about .underline{height:2px;width:160px;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:2px;margin-bottom:18px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+    .card{border:1px solid var(--border);border-radius:14px;padding:16px;background:rgba(16,22,48,.5)}
+    .card h3{margin-top:0;margin-bottom:6px}
+
+    .team{margin-top:24px}
+    .team .card{grid-column:span 2}
+    .people{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:12px}
+    .person{text-align:center}
+    .avatar{width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid var(--border);box-shadow:0 0 0 3px rgba(255,255,255,0.04);display:block;margin:0 auto 10px}
+    .person h4{margin:6px 0 4px;font-size:16px;color:var(--text)}
+    .person p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
+
+    @media (max-width:860px){
+      .slide-inner{grid-template-columns:1fr;grid-template-areas:"txt" "img"}
+      .stack .slide:nth-child(even) .slide-inner{grid-template-columns:1fr;grid-template-areas:"txt" "img"}
+      .slide img{border-left:none;border-top:1px solid var(--border);height:240px}
+      .grid{grid-template-columns:1fr}
+      .team .card{grid-column:auto}
+      .people{grid-template-columns:repeat(2,1fr)}
+    }
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:24px 18px;color:var(--muted);text-align:center}
+    footer a{color:var(--text);text-decoration:none;border-bottom:1px dashed var(--border)}
+    footer a:hover{border-color:var(--accent)}
+
+    /* ROUTER */
+    [data-route]{display:none}
+    [data-route].active{display:block}
+
+    /* BACKGROUND VIDEO */
+    body{background:transparent;}
+    .bg-video{position:fixed;inset:0;z-index:-1;overflow:hidden;background:#000}
+    .bg-video video{width:100%;height:100%;object-fit:cover;filter:brightness(.42) saturate(1.05)}
+    .bg-video .bg-scrim{position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(0,0,0,.15) 0%, rgba(0,0,0,.6) 60%, rgba(0,0,0,.8) 100%)}
+    <style> (max-width:860px){
+        .slide-inner{grid-template-columns:1fr;grid-template-areas:"txt" "img"}
+        .stack .slide:nth-child(even) .slide-inner{grid-template-columns:1fr;grid-template-areas:"txt" "img"}
+        .slide img{border-left:none;border-top:1px solid var(--border);height:240px}
+        .grid{grid-template-columns:1fr}
+        .team .card{grid-column:auto}
+      }
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:24px 18px;color:var(--muted);text-align:center}
+    footer a{color:var(--text);text-decoration:none;border-bottom:1px dashed var(--border)}
+    footer a:hover{border-color:var(--accent)}
+
+    /* ROUTER */
+    [data-route]{display:none}
+    [data-route].active{display:block}
+  </style>
+</head>
+<body>
+  <!-- BACKGROUND VIDEO (muted, no controls) -->
+  <div class="bg-video" aria-hidden="true">
+    <video id="bgvid" autoplay muted loop playsinline preload="metadata">
+      <source src="./mars.mp4" type="video/mp4" />
+      <!-- Fallback text -->
+      Your browser does not support the video tag.
+    </video>
+    <div class="bg-scrim"></div>
+  </div>
+  <!-- NAVBAR -->
+  <nav class="nav">
+    <div class="navwrap">
+      <div class="nav-left">
+        <a id="moreTop" class="btn" href="#" target="_blank" rel="noopener">More</a>
+      </div>
+      <div class="nav-center">
+        <a id="brandLink" class="brand" href="#" target="_blank" rel="noopener" title="Go to NASA team page">AstroCompass</a>
+      </div>
+      <div class="nav-right">
+        <a class="btn" id="aboutBtn" href="#about" title="About">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HOME ROUTE -->
+  <main class="wrap" data-route="home">
+    <section class="hero">
+      <h1>AstroCompass</h1>
+      <div class="underline" aria-hidden="true"></div>
+      <p>We make space and weather data clear and usable for everyone. Simple interfaces, open data, fast results.</p>
+    </section>
+
+    <div class="stack" aria-label="Slides list">
+      <article class="slide">
+        <div class="slide-inner">
+          <div class="txt">
+            <h3>1) Problem</h3>
+            <p>People need quick, reliable, visual access to space and weather insights.</p>
+          </div>
+          <img src="https://placehold.co/1000x700/png" alt="Presentation placeholder" />
+        </div>
+      </article>
+      <article class="slide">
+        <div class="slide-inner">
+          <div class="txt">
+            <h3>2) Approach</h3>
+            <p>Clean UI, open APIs, modular architecture.</p>
+          </div>
+          <img src="https://placehold.co/1000x700/png" alt="Approach placeholder" />
+        </div>
+      </article>
+      <article class="slide">
+        <div class="slide-inner">
+          <div class="txt">
+            <h3>3) Plan</h3>
+            <p>Prototype now, data products next, community tools later.</p>
+          </div>
+          <img src="https://placehold.co/1000x700/png" alt="Plan placeholder" />
+        </div>
+      </article>
+    </div>
+
+    <p style="text-align:center;margin:34px 0 0">
+      <a id="moreBottom" class="link" href="#" target="_blank" rel="noopener">More about this project →</a>
+    </p>
+  </main>
+
+  <!-- ABOUT ROUTE -->
+  <section class="about" data-route="about">
+    <h1>About AstroCompass</h1>
+    <div class="underline" aria-hidden="true"></div>
+    <p>As the <strong>AstroCompass</strong> team, we prioritize the principle of sustainability in space exploration.
+Our project aims to reprocess and reuse space debris and waste that may accumulate on the surface of Mars. Specifically, we focus on recycling metal-based waste, transforming it into reusable materials that can support future human settlements. In doing so, we strive to reduce resource consumption and build a sustainable infrastructure for long-term missions on Mars.</p>
+<p>Inspired by its name, Astro Compass symbolizes guidance, problem-solving, and purposeful exploration—representing humanity’s effort to navigate interplanetary journeys with greater awareness and responsibility.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>🌌 Vision</h3>
+        <p>As Astro Compass, we aim to create sustainable solutions for humanity’s interplanetary journey by processing and recycling space debris and metal waste on Mars.
+By utilizing resources efficiently, we are committed to reducing environmental impact and developing a habitable infrastructure for future missions on Mars.
+</p>
+      </div>
+      <div class="card">
+        <h3>🚀 Mission</h3>
+        <p>To implement a zero-waste approach in future space colonies, enabling sustainable living on Mars and beyond.
+Astro Compass aims to become a pioneering team that develops innovative, recycling-oriented solutions, allowing humanity to leave its mark on the universe without harming nature.</p>
+      </div>
+    </div>
+
+    <div class="team">
+      <div class="card">
+        <h3>👥 Team Intro</h3>
+        <p>We are students from different disciplines collaborating to make sense of space data.</p>
+        <div class="people">
+          <div class="person"> 
+            <img class="avatar" src="resim1.png" alt="Ecrin Taran avatar" /> 
+            <h4>Ecrin Taran</h4> 
+            <p>Software Developer</p> 
+          </div> 
+          <div class="person"> 
+            <img class="avatar" src="./resim2.jpg" alt="Nisa Nur Güneş avatar" /> 
+            <h4>Nisa Nur Güneş</h4> 
+            <p>Software Developer</p> 
+          </div> 
+          <div class="person"> 
+              <img class="avatar" src="./resim3.jpg" alt="Ecrin Taran avatar" /> 
+              <h4>Can Hoşkal</h4> <p>Software Developer</p> 
+            </div> 
+            <div class="person"> 
+              <img class="avatar" src="resim1.png" alt="Ecrin Taran avatar" /> 
+              <h4>Ecrin Taran</h4> 
+              <p>Software Developer</p> 
+            </div> 
+          </div>
+      </div>
+    </div>
+
+    <div class="contact">
+      <div class="card">
+        <h3>💬 Contact</h3>
+        <p>Reach us via our NASA team page or social channels.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    Created by <a id="footerBrand" href="#" target="_blank" rel="noopener">AstroCompass</a>
+  </footer>
+
+  <script>
+    const LINKS = { moreDocx: "https://drive.google.com/file/d/1sw3DukzGG9glPBPGNZgmGnfGscKBkGAm/view?usp=sharing", nasaTeam: "https://www.spaceappschallenge.org/2025/find-a-team/astrocompass/" };
+    function safeHref(id, url){ const el=document.getElementById(id); if(el && url) el.href=url; }
+    safeHref('moreTop', LINKS.moreDocx);
+    safeHref('moreBottom', LINKS.moreDocx);
+    safeHref('brandLink', LINKS.nasaTeam);
+    safeHref('footerBrand', LINKS.nasaTeam);
+
+    const routes = { home: document.querySelector('[data-route="home"]'), about: document.querySelector('[data-route="about"]') };
+
+    function render(){
+      const hash = (location.hash || '#').replace('#','') || 'home';
+      Object.values(routes).forEach(el => el.classList.remove('active'));
+      (routes[hash] || routes.home).classList.add('active');
+      const aboutBtn = document.getElementById('aboutBtn');
+      if(aboutBtn){
+        if(hash === 'about'){
+          aboutBtn.textContent = 'Home';
+          aboutBtn.title = 'Go to Home';
+          aboutBtn.setAttribute('href', '#home');
+          aboutBtn.setAttribute('aria-current','page');
+        } else {
+          aboutBtn.textContent = 'About';
+          aboutBtn.title = 'About';
+          aboutBtn.setAttribute('href', '#about');
+          aboutBtn.removeAttribute('aria-current');
+        }
+      }
+    }
+    window.addEventListener('hashchange', render);
+    render();
+  </script>
+</body>
+</html>
